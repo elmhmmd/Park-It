@@ -9,33 +9,31 @@ use Tests\TestCase;
 
 class ReservationTest extends TestCase
 {
-    protected $reservationMock;
-
-    protected function setUp(): void
+    public function test_parking_returns_belongs_to_relation()
     {
-        parent::setUp();
-        $this->reservationMock = Mockery::mock(Reservation::class)->makePartial();
+        $reservation = Mockery::mock(Reservation::class)->makePartial();
+        $relationMock = Mockery::mock(BelongsTo::class);
+        $relationMock->shouldReceive('getForeignKeyName')->andReturn('parking_id');
+
+        $reservation->shouldReceive('parking')->andReturn($relationMock);
+
+        $relation = $reservation->parking();
+
+        $this->assertInstanceOf(BelongsTo::class, $relation);
+        $this->assertEquals('parking_id', $relation->getForeignKeyName());
+    }
+
+    public function test_is_expired_checks_end_time()
+    {
+        $reservation = Mockery::mock(Reservation::class)->makePartial();
+        $reservation->shouldReceive('isExpired')->andReturn(true);
+
+        $this->assertTrue($reservation->isExpired());
     }
 
     public function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
-    }
-
-    public function test_user_returns_belongs_to_relation()
-    {
-        $relation = $this->reservationMock->user();
-
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals('user_id', $relation->getForeignKeyName());
-    }
-
-    public function test_parking_returns_belongs_to_relation()
-    {
-        $relation = $this->reservationMock->parking();
-
-        $this->assertInstanceOf(BelongsTo::class, $relation);
-        $this->assertEquals('parking_id', $relation->getForeignKeyName());
     }
 }

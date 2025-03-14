@@ -9,29 +9,25 @@ use Tests\TestCase;
 
 class CleanExpiredReservationsTest extends TestCase
 {
-    protected $reservationMock;
-
-    protected function setUp(): void
+    public function test_it_deletes_expired_reservations()
     {
-        parent::setUp();
-        $this->reservationMock = Mockery::mock('alias:' . Reservation::class);
-    }
+        // Create a mock for the Reservation model
+        $reservationMock = Mockery::mock('alias:App\Models\Reservation');
 
-    /** @test */
-    public function it_deletes_expired_reservations()
-    {
-        $this->reservationMock->shouldReceive('where')
+        // Mock the query behavior
+        $reservationMock->shouldReceive('where')
             ->with('end_time', '<', Mockery::type(\Illuminate\Support\Carbon::class))
             ->once()
             ->andReturnSelf();
-        $this->reservationMock->shouldReceive('delete')
+
+        $reservationMock->shouldReceive('delete')
             ->once()
-            ->andReturn(1);
+            ->andReturn(1); // Simulating deletion
 
-        $job = new CleanExpiredReservations();
-        $job->handle();
+        // Run the job
+        (new CleanExpiredReservations())->handle();
 
-        $this->assertTrue(true); // If no exceptions, it worked
+        $this->assertTrue(true); // Test passes if no exceptions are thrown
     }
 
     public function tearDown(): void
