@@ -20,10 +20,8 @@ class ParkingController extends Controller
 
     public function search(Request $request)
     {
-        $request->validate([...]);
+        $request->validate([...]); 
         $parkings = $this->parkingModel->where('city', $request->input('city'))->get();
-        // ...
     }
 
-    // Replace all Parking:: and Reservation:: with $this->parkingModel and $this->reservationModel
 }
